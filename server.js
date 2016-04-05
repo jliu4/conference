@@ -12,7 +12,7 @@ var fileServer = new(static.Server)();
 
 var app = http.createServer(function (req, res) {
   fileServer.serve(req, res);
-}).listen(2013);
+}).listen(process.env.PORT || 2013);
 
 var apps = https.createServer({key:privateKey, cert: certificate },function (req, res) {
   fileServer.serve(req, res);
@@ -22,7 +22,7 @@ var apps = https.createServer({key:privateKey, cert: certificate },function (req
 var io = socketIO.listen(app);
 var ios = require('socket.io').listen(apps);
 
-ios.sockets.on('connection', function (socket){
+io.sockets.on('connection', function (socket){
 
     // convenience function to log server messages on the client
     function log(){
