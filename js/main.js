@@ -17,6 +17,10 @@ var configuration = {'iceServers': [{'url': 'stun:stun.l.google.com:19302'}]},
     // Maybe redefined later based on user's webcam video stream.
     photoContextW = 300, photoContextH = 150;
 
+// Set up audio and video regardless of what devices are present.
+var sdpConstraints = {'mandatory': {
+  'OfferToReceiveAudio':true,
+  'OfferToReceiveVideo':true }};
 // Attach even handlers
 video.addEventListener('play', setCanvasDimensions);
 snapBtn.addEventListener('click', snapPhoto);

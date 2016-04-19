@@ -28,7 +28,7 @@ io.sockets.on('connection', function (socket){
         log('Request to create or join room ' + room);
         
         var clients = io.sockets.adapter.rooms[room];
-        log("clients: "+clients);
+        log("clients: " + clients);
 	    var numClients =clients!=undefined ? clients.length:0;
 
 		log('Room ' + room + ' has ' + numClients + ' client(s)');
@@ -42,9 +42,12 @@ io.sockets.on('connection', function (socket){
             socket.emit('joined', room, socket.id);
             io.sockets.in(room).emit('ready');
 
-		} //else { // max two clients
-			//socket.emit('full', room);
-		//}
+		} else { // max two clients
+			socket.emit('full', room);
+		}
+        socket.emit('emit(): client ' + socket.id + ' joined room ' + room);
+        socket.broadcast.emit('broadcast(): client ' + socket.id + ' joined room ' + room);
+
 	});
 
     socket.on('ipaddr', function () {
