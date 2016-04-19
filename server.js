@@ -1,26 +1,33 @@
 var os = require('os');
-var fs = require('fs');
+
+//explaination http://www.kevinleary.net/simple-node-static-server/
+//modules
 var static = require('node-static');
+
+//from node.js
 var http = require('http');
-var https = require('https');
-
 var socketIO = require('socket.io');
-var privateKey = fs.readFileSync('server.key').toString(),
-    certificate = fs.readFileSync('server.crt').toString();
 
+//config
 var fileServer = new(static.Server)();
+//http.createServer return http.server
+//https://nodejs.org/api/http.html#http_http_createserver_requestlistener
 
+//this is an anonymous function that defines what happens 
+//with each request to the server and response from the server.
+//function(req,res) {
+//	fileServer.server(req,res);
+//}
+//server
 var app = http.createServer(function (req, res) {
   fileServer.serve(req, res);
-}).listen(process.env.PORT || 2013);
+}).listen(2013);
 
-var apps = https.createServer({key:privateKey, cert: certificate },function (req, res) {
-  fileServer.serve(req, res);
-}).listen(2016);
-
-
+//server is instantiated (note: not connected to) we will open a listener for socket.io. 
+//This means that our server will ‘listen’ for pages loaded by the server 
+//that have a WebSocket connection instantiated on them.
+//http://danielnill.com/nodejs-tutorial-with-socketio/
 var io = socketIO.listen(app);
-var ios = require('socket.io').listen(apps);
 
 io.sockets.on('connection', function (socket){
 
@@ -30,7 +37,7 @@ io.sockets.on('connection', function (socket){
         array.push.apply(array, arguments);
 	    socket.emit('log', array);
 	}
-
+    //comment out for production
 	socket.on('message', function (message) {
 		log('Client said:', message);
         // for a real app, would be room only (not broadcast)
@@ -39,30 +46,40 @@ io.sockets.on('connection', function (socket){
 
 	socket.on('create or join', function (room) {
         log('Request to create or join room ' + room);
+        log(io.sockets.adapter.rooms);
 
-		//var numClients = io.sockets.clients(room).length;
-		//log('Room ' + room + ' has ' + numClients + ' client(s)');
+		var numClients = io.sockets.adapter.rooms[room]!=undefined ? Object.keys(io.sockets.adapter.rooms).length:0;
+		log('Room ' + room + ' has ' + numClients + ' client(s)');
+		log(io.sockets.adapter.rooms[room]);
+		
+		
+		//JLIU TODO io.sockets.adapter.rooms is null  
+	    numClients = 1;
+		
 
-		//if (numClients === 0){
-		//	socket.join(room);
-		//	socket.emit('created', room, socket.id);
+		if (numClients === 0){
+			socket.join(room);
+			socket.emit('created', room, socket.id);
 
-		//} else if (numClients === 1) {
-		//	socket.join(room);
-        //    socket.emit('joined', room, socket.id);
-        //   io.sockets.in(room).emit('ready');
 
-		//} else { // max two clients
-		//	socket.emit('full', room);
-		//}
+		} else if (numClients === 1) {
+			socket.join(room);
+            socket.emit('joined', room, socket.id);
+            io.sockets.in(room).emit('ready');
+
+		} else { // max two clients
+			socket.emit('full', room);
+		}
 	});
-
+     
+   
     socket.on('ipaddr', function () {
         var ifaces = os.networkInterfaces();
         for (var dev in ifaces) {
             ifaces[dev].forEach(function (details) {
                 if (details.family=='IPv4' && details.address != '127.0.0.1') {
                     socket.emit('ipaddr', details.address);
+                    log('Server IP address is: ' + details.address);
                 }
           });
         }
