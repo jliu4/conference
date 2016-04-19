@@ -21,7 +21,7 @@ var fileServer = new(static.Server)();
 //server
 var app = http.createServer(function (req, res) {
   fileServer.serve(req, res);
-}).listen(2013);
+}).listen(process.env.PORT || 2013);
 
 //server is instantiated (note: not connected to) we will open a listener for socket.io. 
 //This means that our server will ‘listen’ for pages loaded by the server 
