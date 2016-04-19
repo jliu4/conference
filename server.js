@@ -27,9 +27,9 @@ io.sockets.on('connection', function (socket){
 	socket.on('create or join', function (room) {
         log('Request to create or join room ' + room);
         
-        var clients =io.sockets.adapter.rooms[room];
+        var clients = io.sockets.adapter.rooms[room];
         log("clients: "+clients);
-	    var numClients =clients!=undefined ? io.sockets.adapter.rooms.length:0;
+	    var numClients =clients!=undefined ? clients.length:0;
 
 		log('Room ' + room + ' has ' + numClients + ' client(s)');
 
