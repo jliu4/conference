@@ -37,7 +37,7 @@ io.sockets.on('connection', function (socket){
 			socket.join(room);
 			socket.emit('created', room, socket.id);
 
-		} else if (numClients === 10) {
+		} else if (numClients < 10) {
 			socket.join(room);
             socket.emit('joined', room, socket.id);
             io.sockets.in(room).emit('ready');
