@@ -1,17 +1,15 @@
 <!DOCTYPE html>
 <html>
     <head>
-    <meta content="text/html;charset=utf-8" http-equiv="Content-Type">
-<meta content="utf-8" http-equiv="encoding">
-        <meta name="keywords" content="JavaScript, WebRTC" />
-        <meta name="description" content="WebRTC codelab" />
+        <meta content="text/html;charset=utf-8" http-equiv="Content-Type">
+        <meta content="utf-8" http-equiv="encoding">
         <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1">
 
-        <title>WebRTC codelab: step X</title>
+        <title>WebRTC snap</title>
         <link rel="stylesheet" href="css/main.css">
     </head>
     <body>
-        <h1>WebRTC codelab: step X</h1>
+        <h1>WebRTC snap</h1>
 
         <p>
             Room URL: <br>
@@ -21,7 +19,11 @@
         <video class="camera" autoplay></video>
         <div class="controls">
             <canvas id="photo" style="width: 200px; height: 150px; border: 1px solid #ccc;"></canvas>
-            <p>
+            <p> 
+                <input type="text" id="room-id" value="JinLiu">
+                <button id="open-room">Open Room</button>
+                <button id="join-room">Join Room</button>
+
                 <button id="snap">snap</button>-then-<button id="send">send</button> 
                 <br> - or - <br>
                 <button id="snapAndSend">snap & send</button>
