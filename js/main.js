@@ -35,8 +35,11 @@ snapBtn.addEventListener('click', snapPhoto);
 sendBtn.addEventListener('click', sendPhoto);
 snapAndSendBtn.addEventListener('click', snapAndSend);
 textBtn.addEventListener('click', sendText);
+
+
 // Create a random room if not already present in the URL.
 var isInitiator;
+
 var room = window.location.hash.substring(1);
 if (!room) {
     room = window.location.hash = randomToken();
@@ -144,6 +147,32 @@ function getMediaErrorCallback(error){
 
 var peerConn;
 var dataChannel;
+var isText = true;
+
+document.getElementById('textSend').onkeyup = function(e) {
+    isText = true;
+    if (e.keyCode != 13) return;
+
+    // removing trailing/leading whitespace
+    this.value = this.value.replace(/^\s+|\s+$/g, '');
+    if (!this.value.length) return;
+
+    dataChannel.send(this.value);
+    appendDIV(this.value);
+    this.value = '';
+};
+
+var chatContainer = document.querySelector('.chat-output');
+
+function appendDIV(event) {
+    var div = document.createElement('div');
+    div.innerHTML = event.data || event;
+    chatContainer.insertBefore(div, chatContainer.firstChild);
+    div.tabIndex = 0;
+    div.focus();
+
+    document.getElementById('textSend').focus();
+}
 
 function signalingMessageCallback(message) {
     if (message.type === 'offer') {
@@ -166,9 +195,9 @@ function signalingMessageCallback(message) {
 function createPeerConnection(isInitiator, config) {
     console.log('Creating Peer connection as initiator?', isInitiator, 'config:', config);
     peerConn = new RTCPeerConnection(config);
-    dataChannelSend.disabled = false;
-    dataChannelSend.focus();
-    dataChannelSend.placeholder = "";
+    textSend.disabled = false;
+    textSend.focus();
+    textSend.placeholder = "";
 
     // send any ice candidates to the other peer
     peerConn.onicecandidate = function (event) {
@@ -201,6 +230,7 @@ function createPeerConnection(isInitiator, config) {
     }
 }
 
+
 function onLocalSessionCreated(desc) {
     console.log('local session created:', desc);
     peerConn.setLocalDescription(desc, function () {
@@ -216,18 +246,20 @@ function onDataChannelCreated(channel) {
         console.log('CHANNEL opened!!!');
     };
 
-    channel.onmessage = (webrtcDetectedBrowser == 'firefox') ? 
-        receiveDataFirefoxFactory() :
-        receiveDataChromeFactory();
+    channel.onmessage = appendDIV;
+    //(webrtcDetectedBrowser == 'firefox') ? 
+      //  receiveDataFirefoxFactory() :
+        //receiveDataChromeFactory();
 }
 
 function receiveDataChromeFactory() {
+
     var buf, count;
 
     return function onmessage(event) {
+       
         if (typeof event.data === 'string') {
-            document.getElementById("dataChannelReceive").value = event.data;
-      
+            
             buf = window.buf = new Uint8ClampedArray(parseInt(event.data));
             count = 0;
             console.log('Expecting a total of ' + buf.byteLength + ' bytes');
@@ -246,6 +278,7 @@ function receiveDataChromeFactory() {
             renderPhoto(buf);
         }
     }
+
 }
 
 function receiveDataFirefoxFactory() {
@@ -254,7 +287,7 @@ function receiveDataFirefoxFactory() {
     return function onmessage(event) {
 
         if (typeof event.data === 'string') {
-            document.getElementById("dataChannelReceive").value = event.data;
+             appendDIV;
       
             total = parseInt(event.data);
             parts = [];
@@ -300,6 +333,7 @@ function snapPhoto() {
 
 function sendPhoto() {
     // Split data channel message in chunks of this byte length.
+    isText = false;
     var CHUNK_LEN = 64000;
 
     var img = photoContext.getImageData(0, 0, photoContextW, photoContextH),
@@ -330,7 +364,7 @@ function snapAndSend() {
 }
 
 function sendText() {
-  var data = document.getElementById("dataChannelSend").value;
+  var data = document.getElementById("textSend").value;
   dataChannel.send(data);
 }
 
