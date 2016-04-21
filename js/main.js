@@ -1,6 +1,13 @@
 /****************************************************************************
  * Initial setup
  ****************************************************************************/
+var video_constraints = {
+  mandatory: {
+    maxHeight: 240,
+    maxWidth: 240 
+  },
+  optional: []
+};
 
 var configuration = {'iceServers': [{'url': 'stun:stun.l.google.com:19302'}]},
 // {"url":"stun:stun.services.mozilla.com"}
@@ -13,6 +20,7 @@ var configuration = {'iceServers': [{'url': 'stun:stun.l.google.com:19302'}]},
     snapBtn = document.getElementById('snap'),
     sendBtn = document.getElementById('send'),
     snapAndSendBtn = document.getElementById('snapAndSend'),
+    textBtn = document.getElementById("text"),
     // Default values for width and height of the photoContext.
     // Maybe redefined later based on user's webcam video stream.
     photoContextW = 300, photoContextH = 150;
@@ -26,7 +34,7 @@ video.addEventListener('play', setCanvasDimensions);
 snapBtn.addEventListener('click', snapPhoto);
 sendBtn.addEventListener('click', sendPhoto);
 snapAndSendBtn.addEventListener('click', snapAndSend);
-
+textBtn.addEventListener('click', sendText);
 // Create a random room if not already present in the URL.
 var isInitiator;
 var room = window.location.hash.substring(1);
@@ -113,7 +121,7 @@ function updateRoomURL(ipaddr) {
 
 function grabWebCamVideo() {
     console.log('Getting user media (video) ...');
-    getUserMedia({video: true}, getMediaSuccessCallback, getMediaErrorCallback);
+    getUserMedia({video: video_constraints}, getMediaSuccessCallback, getMediaErrorCallback);
 }
 
 function getMediaSuccessCallback(stream) {
@@ -158,6 +166,9 @@ function signalingMessageCallback(message) {
 function createPeerConnection(isInitiator, config) {
     console.log('Creating Peer connection as initiator?', isInitiator, 'config:', config);
     peerConn = new RTCPeerConnection(config);
+    dataChannelSend.disabled = false;
+    dataChannelSend.focus();
+    dataChannelSend.placeholder = "";
 
     // send any ice candidates to the other peer
     peerConn.onicecandidate = function (event) {
@@ -215,6 +226,8 @@ function receiveDataChromeFactory() {
 
     return function onmessage(event) {
         if (typeof event.data === 'string') {
+            document.getElementById("dataChannelReceive").value = event.data;
+      
             buf = window.buf = new Uint8ClampedArray(parseInt(event.data));
             count = 0;
             console.log('Expecting a total of ' + buf.byteLength + ' bytes');
@@ -239,7 +252,10 @@ function receiveDataFirefoxFactory() {
     var count, total, parts;
 
     return function onmessage(event) {
+
         if (typeof event.data === 'string') {
+            document.getElementById("dataChannelReceive").value = event.data;
+      
             total = parseInt(event.data);
             parts = [];
             count = 0;
@@ -311,6 +327,11 @@ function sendPhoto() {
 function snapAndSend() {
     snapPhoto();
     sendPhoto();
+}
+
+function sendText() {
+  var data = document.getElementById("dataChannelSend").value;
+  dataChannel.send(data);
 }
 
 function renderPhoto(data) {
