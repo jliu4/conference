@@ -1,26 +1,39 @@
 
 
+        <!-- scripts used for video-conferencing -->
+        <!--script src="//cdn.webrtc-experiment.com/firebase.js"> </script-->
+        <!--https://webrtcexperiment-webrtc.netdna-ssl.com/firebase.js-->
+
+        <!--script src="//cdn.webrtc-experiment.com/RTCPeerConnection-v1.5.js"> </script-->
+        <!--https://webrtcexperiment-webrtc.netdna-ssl.com/RTCPeerConnection-v1.5.js-->
+        <!--script src="//cdn.webrtc-experiment.com/video-conferencing/conference.js"> </script-->
+        <!--https://webrtcexperiment-webrtc.netdna-ssl.com/video-conferencing/conference.js-->       
+        <!-- script used to stylize video element -->
+        <!--script src="//cdn.webrtc-experiment.com/getMediaElement.min.js"> </script-->
 <script src=jinadded/firebase.js> </script>
         
+        <script src=jinadded/RTCPeerConnection-v1.5.js> </script>
+<!--script src=jinadded/adapter.js> </script-->
 
-<script src=jinadded/adapter.js> </script>
-<script src=jinadded/jinRTCPeerConnection.js> </script>
-<script src=jinadded/jinconference.js> </script>
-
+<script src=jinadded/conference.js> </script>
+        <!--script src=jinadded/getMediaElement.js> </script-->
+            <!--div class="github-stargazers"></div-->
+        
+            <!-- just copy this <section> and next script -->
 <section class="experiment">                
     <section>                
         <input type="text" id="conference-name">
             <button id="setup-new-room" class="setup">Setup New Conference</button>
     </section>               
-    <!-- list of all available conferencing rooms --> <!--jliutodo:show the room-list-->
+    <!-- list of all available conferencing rooms -->
     <table style="width: 50%;" id="rooms-list"></table>            
     <!-- local/remote videos container -->
     <div id="videos-container"></div>
 </section>
         
-<script>   
+<script>  
     var videoWidth = 240;
-    var videoHeight = 240;            
+    var videoHeight = 240;               
     var config = {
         openSocket: function(config) {
             var channel = config.channel || location.href.replace( /\/|:|#|%|\.|\[|\]/g , '');
@@ -80,7 +93,7 @@
     };
 
     var conferenceUI = conference(config);
-    var videosContainer = document.getElementById('videos-container') || document.body;        
+    var videosContainer = document.getElementById('videos-container') || document.body;
     var roomsList = document.getElementById('rooms-list');
 
     document.getElementById('setup-new-room').onclick = function () {
@@ -99,18 +112,29 @@
         video.setAttribute('height',videoHeight);
         video.setAttribute('width',videoWidth);
         videosContainer.insertBefore(video, videosContainer.firstChild);
-       
-        getUserMedia({video: true,audio: true }, successCallback, errorCallback);
-            //getUserMedia({video: true ,audio: true }).then(successCallback).catch(errorCallback);
-        function successCallback(stream) {
-            video.src =  window.URL.createObjectURL(stream);
-            config.attachStream = stream;  
-            callback();  
+        if (1==0) {
+        getUserMedia({video: {maxHeight: 120, maxWidth: 120} ,audio: true }, getMediaSuccessCallback, getMediaErrorCallback);
+
+        function getMediaSuccessCallback(stream) {
+            //video.src =  window.URL.createObjectURL(stream);
+            config.attachStream = stream;
+            callback();
         }
 
-        function errorCallback(error){
-             console.log("getUserMedia error:", error);
+        function getMediaErrorCallback(error){
+            console.log("getUserMedia error:", error);
 
+        }
+        }
+        if (1==1) {
+        getUserMedia({
+        video: video, 
+        onsuccess: function (stream) {
+                config.attachStream = stream;
+                video.setAttribute('muted', true);
+                callback();
+            }
+        });
         }
     
     }
