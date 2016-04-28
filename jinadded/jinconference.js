@@ -194,7 +194,7 @@ var conference = function(config) {
             });
         }
 
-        if (config.attachStream) config.attachStream.stop();
+        if (config.attachStream) config.attachStream.stop;
     }
     
     window.addEventListener('beforeunload', function () {
