@@ -5,7 +5,7 @@
 <!--script src=//cdn.webrtc-experiment.com/gumadapter.js> </script-->
 <!--script src=js/adapter-latest.js> </script-->
 <!--script src=//cdn.temasys.com.sg/adapterjs/0.13.3/adapter.debug.js> </script-->
-<script src=js/adapter-1.0.5.js> </script>
+<script src=js/adapter-1.1.0.js> </script>
 <script src=jinadded/jinRTCPeerConnection.js> </script>
 <script src=jinadded/jinconference.js> </script>
 
@@ -103,7 +103,7 @@
         videosContainer.insertBefore(video, videosContainer.firstChild);
        
         //getUserMedia({video: true,audio: true }, successCallback, errorCallback);
-        navigator.mediaDevices.getUserMedia({video: true ,audio: true }).then(successCallback).catch(errorCallback);
+        navigator.mediaDevices.getUserMedia({video: true,audio: true }).then(successCallback).catch(errorCallback);
         function successCallback(stream) {
             video.src =  window.URL.createObjectURL(stream);
             config.attachStream = stream;  
