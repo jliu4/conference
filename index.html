@@ -103,7 +103,7 @@
         videosContainer.insertBefore(video, videosContainer.firstChild);
        
         //getUserMedia({video: true,audio: true }, successCallback, errorCallback);
-        getUserMedia({video: true ,audio: true }).then(successCallback).catch(errorCallback);
+        navigator.mediaDevices.getUserMedia({video: true ,audio: true }).then(successCallback).catch(errorCallback);
         function successCallback(stream) {
             video.src =  window.URL.createObjectURL(stream);
             config.attachStream = stream;  
