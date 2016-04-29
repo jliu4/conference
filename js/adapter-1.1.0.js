@@ -28,6 +28,7 @@
 
   // Browser shims.
   var chromeShim = require('./chrome/chrome_shim') || null;
+  console.log(chromShim);
   var edgeShim = require('./edge/edge_shim') || null;
   var firefoxShim = require('./firefox/firefox_shim') || null;
   var safariShim = require('./safari/safari_shim') || null;
