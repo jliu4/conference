@@ -7,7 +7,6 @@ var server = require(isUseHTTPs ? 'https' : 'http'),
     fs = require('fs');
 
 var static = require('node-static');
-var socketIO = require('socket.io');
 var file = new(static.Server)();
 var app;
 
@@ -29,14 +28,6 @@ app = app.listen(process.env.PORT || 9001, process.env.IP || "0.0.0.0", function
     console.log("Server listening at", addr.address + ":" + addr.port);
 });
 
-var io = socketIO.listen(app);
-io.sockets.on('connection', function (socket) {
-    socket.on('message', function (data) {
-        socket.broadcast.emit('message', data);
-    });
-});
-
-if (1==0) {
 require('./Signaling-Server.js')(app, function(socket) {
     try {
         var params = socket.handshake.query;
@@ -52,4 +43,3 @@ require('./Signaling-Server.js')(app, function(socket) {
         });
     } catch (e) {}
 });
-}
