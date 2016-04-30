@@ -8,7 +8,7 @@ var MyPeerConnection = function(options) {
 
     console.debug('optional-arguments', JSON.stringify(optional.optional, null, '\t'));
 
-    var peer = new RTCPeerConnection(iceServersObject);
+    var peer = new RTCPeerConnection(iceServersObject,optional);
 
     peer.onicecandidate = function(event) {
         if (event.candidate) {

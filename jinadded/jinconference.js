@@ -85,6 +85,7 @@ var conference = function(config) {
             },
             onRemoteStreamEnded: function(stream) {
                 if (config.onRemoteStreamEnded)
+
                     config.onRemoteStreamEnded(stream, video);
             }
         };
@@ -173,6 +174,7 @@ var conference = function(config) {
     }
 
     function leave() {
+        console.log("Leave");
         var length = sockets.length;
         for (var i = 0; i < length; i++) {
             var socket = sockets[i];
