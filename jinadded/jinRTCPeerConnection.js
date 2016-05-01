@@ -1,12 +1,37 @@
 'use strict';
 
+var iceServers = [];
+
+iceServers.push({
+    url: 'stun:stun.l.google.com:19302'
+});
+
+iceServers.push({
+    url: 'stun:stun.anyfirewall.com:3478'
+});
+
+iceServers.push({
+    url: 'turn:turn.bistri.com:80',
+    credential: 'homeo',
+    username: 'homeo'
+});
+
+iceServers.push({
+    url: 'turn:turn.anyfirewall.com:443?transport=tcp',
+    credential: 'webrtc',
+    username: 'webrtc'
+});
+
+var iceServersObject = {
+    iceServers: iceServers
+};
+
 var MyPeerConnection = function(options) {
     var optional = {
         optional: []
     };
      
-
-    console.debug('optional-arguments', JSON.stringify(optional.optional, null, '\t'));
+    //console.debug('optional-arguments', JSON.stringify(optional.optional, null, '\t'));
 
     var peer = new RTCPeerConnection(iceServersObject,optional);
 
@@ -15,8 +40,7 @@ var MyPeerConnection = function(options) {
             options.onICE(event.candidate);
         }
     };
-
-     
+ 
     if (options.attachStream) peer.addStream(options.attachStream);
 
     if (options.attachStreams && options.attachStream.length) {
@@ -36,7 +60,7 @@ var MyPeerConnection = function(options) {
   
             if (options.onRemoteStream) options.onRemoteStream(remoteMediaStream);
 
-                console.debug('on:add:stream', remoteMediaStream);
+                //console.debug('on:add:stream', remoteMediaStream);
         }, 2000);
     };
         
@@ -57,7 +81,7 @@ var MyPeerConnection = function(options) {
         }
     };
             
-    console.debug('sdp-constraints', JSON.stringify(sdpConstraints, null, '\t'));
+   // console.debug('sdp-constraints', JSON.stringify(sdpConstraints, null, '\t'));
 
     function createOffer() {
         if (!options.onOfferSDP) return;
@@ -67,7 +91,7 @@ var MyPeerConnection = function(options) {
             peer.setLocalDescription(sessionDescription);
             options.onOfferSDP(sessionDescription);
 
-            console.debug('offer-sdp', sessionDescription.sdp);
+            //console.debug('offer-sdp', sessionDescription.sdp);
         }, onSdpError, sdpConstraints);
     }
 
@@ -75,13 +99,13 @@ var MyPeerConnection = function(options) {
         if (!options.onAnswerSDP) return;
 
             //options.offerSDP.sdp = addStereo(options.offerSDP.sdp);
-        console.debug('offer-sdp', options.offerSDP.sdp);
+        //console.debug('offer-sdp', options.offerSDP.sdp);
         peer.setRemoteDescription(new RTCSessionDescription(options.offerSDP), onSdpSuccess, onSdpError);
         peer.createAnswer(function(sessionDescription) {
             sessionDescription.sdp = setBandwidth(sessionDescription.sdp);
             peer.setLocalDescription(sessionDescription);
             options.onAnswerSDP(sessionDescription);
-            console.debug('answer-sdp', sessionDescription.sdp);
+            //console.debug('answer-sdp', sessionDescription.sdp);
         }, onSdpError, sdpConstraints);
     }
 
@@ -108,7 +132,7 @@ var MyPeerConnection = function(options) {
         return sdp;
     }
 
-        // DataChannel management
+    // DataChannel management
     var channel;
 
     if (!!options.onChannelMessage) {
@@ -158,7 +182,7 @@ var MyPeerConnection = function(options) {
 
     return {
         addAnswerSDP: function(sdp) {
-            console.debug('adding answer-sdp', sdp.sdp);
+            //console.debug('adding answer-sdp', sdp.sdp);
             peer.setRemoteDescription(new RTCSessionDescription(sdp), onSdpSuccess, onSdpError);
         },
         addICE: function(candidate) {
@@ -167,7 +191,7 @@ var MyPeerConnection = function(options) {
                 candidate: candidate.candidate
             }));
 
-            console.debug('adding-ice', candidate.candidate);
+            //console.debug('adding-ice', candidate.candidate);
         },
 
         peer: peer,
@@ -178,6 +202,8 @@ var MyPeerConnection = function(options) {
     };
 };
 
+if (1==0) {
+
 function listenEventHandler(eventName, eventHandler) {
     window.removeEventListener(eventName, eventHandler);
     window.addEventListener(eventName, eventHandler, false);
@@ -187,6 +213,7 @@ var loadedIceFrame;
 
 function loadIceFrame(callback) {
     if (loadedIceFrame) {
+        console.log("loadedIcdFrame");
         return;
     }
 
@@ -215,33 +242,9 @@ function loadIceFrame(callback) {
     (document.body || document.documentElement).appendChild(iframe);
 }
 
-var iceServers = [];
-
-iceServers.push({
-    url: 'stun:stun.l.google.com:19302'
-});
-
-iceServers.push({
-    url: 'stun:stun.anyfirewall.com:3478'
-});
-
-iceServers.push({
-    url: 'turn:turn.bistri.com:80',
-    credential: 'homeo',
-    username: 'homeo'
-});
-
-iceServers.push({
-    url: 'turn:turn.anyfirewall.com:443?transport=tcp',
-    credential: 'webrtc',
-    username: 'webrtc'
-});
-
-var iceServersObject = {
-    iceServers: iceServers
-};
 
 loadIceFrame(function (iceServers) {
     iceServersObject.iceServers = iceServersObject.iceServers.concat(iceServers);
 });
+}
 
