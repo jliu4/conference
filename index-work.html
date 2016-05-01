@@ -42,7 +42,9 @@
                         socket.on("child_added", function(data) {
                             config.onmessage && config.onmessage(data.val());
                         });
+
                         socket.send = function(data) {
+                            console.log("this:"+this);
                             this.push(data);
                         };
                         config.onopen && setTimeout(config.onopen, 1);
